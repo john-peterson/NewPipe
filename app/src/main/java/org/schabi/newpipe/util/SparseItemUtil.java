@@ -92,7 +92,17 @@ public final class SparseItemUtil {
                                                 @NonNull final String url,
                                                 @NonNull final Consumer<String> callback) {
         fetchStreamInfoAndSaveToDatabase(context, serviceId, url,
-                streamInfo -> callback.accept(streamInfo.getTopicUrl()));
+                streamInfo -> {
+            try {
+                final String topicUrl = streamInfo.getTopicUrl();
+                if (!isNullOrEmpty(topicUrl)) {
+                    callback.accept(topicUrl);
+                }
+            } catch (final Exception e) {
+                ErrorUtil.createNotification(context, new ErrorInfo(e,
+                        UserAction.REQUESTED_STREAM, e.getMessage()));
+            }
+                });
     }
 
     /**
